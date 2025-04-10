@@ -15,6 +15,11 @@ typedef struct app_t {
     SDL_Window* window;
     SDL_Renderer* renderer;
     TTF_Font* font;
+
+    int grid_x;
+    int grid_y;
+    int grid_w;
+    int grid_h;
 } app_t;
 
 #endif // _APP_H

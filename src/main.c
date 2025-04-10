@@ -8,8 +8,10 @@
 #include<SDL2/SDL_ttf.h>
 
 #include<app.h>
+#include<sudoku.h>
 
 app_t* app;
+sudoku_t* sud;
 
 void game_handle_events() {
     SDL_Event event;
@@ -28,8 +30,80 @@ void game_update(double dt) {
 }
 
 void game_render() {
-    SDL_SetRenderDrawColor(app->renderer, 255, 200, 200, 255);
+    SDL_SetRenderDrawColor(app->renderer, 150, 150, 150, 255);
     SDL_RenderClear(app->renderer);
+
+    SDL_SetRenderDrawColor(app->renderer, 0, 0, 0, 255);
+    SDL_RenderDrawRect(
+        app->renderer,
+        &(SDL_Rect){
+            .x = app->grid_x,
+            .y = app->grid_y,
+            .w = app->grid_w,
+            .h = app->grid_h
+        }
+    );
+
+    int cw = app->grid_w / 9;
+    int ch = app->grid_h / 9;
+
+    // Cells
+    for (int cy = 0; cy < 9; cy++) {
+        for (int cx = 0; cx < 9; cx++) {
+            //cell_t cell = sud->grid[cy][cx];
+            SDL_SetRenderDrawColor(app->renderer, 0, 0, 0, 255);
+            SDL_RenderDrawRect(
+                app->renderer,
+                &(SDL_Rect){
+                    .x = app->grid_x + cx * cw,
+                    .y = app->grid_y + cy * ch,
+                    .w = cw,
+                    .h = ch
+                }
+            );
+        }
+    }
+    // Sub grid separators
+    SDL_SetRenderDrawColor(app->renderer, 220, 220, 220, 255);
+    // Horizontal
+    SDL_RenderFillRect(
+        app->renderer,
+        &(SDL_Rect){
+            .x = app->grid_x,
+            .y = app->grid_y + 3 * ch - 1,
+            .w = app->grid_w,
+            .h = 2
+        }
+    );
+    SDL_RenderFillRect(
+        app->renderer,
+        &(SDL_Rect){
+            .x = app->grid_x,
+            .y = app->grid_y + 6 * ch - 1,
+            .w = app->grid_w,
+            .h = 2
+        }
+    );
+    // Vertical
+    SDL_RenderFillRect(
+        app->renderer,
+        &(SDL_Rect){
+            .x = app->grid_x + 3 * cw - 1,
+            .y = app->grid_y,
+            .w = 2,
+            .h = app->grid_h
+        }
+    );
+    SDL_RenderFillRect(
+        app->renderer,
+        &(SDL_Rect){
+            .x = app->grid_x + 6 * cw - 1,
+            .y = app->grid_y,
+            .w = 2,
+            .h = app->grid_h
+        }
+    );
+
     SDL_RenderPresent(app->renderer);
 }
 
@@ -41,7 +115,7 @@ int main(int argc, char** argv) {
 
     assert(SDL_Init(SDL_INIT_EVERYTHING) == 0);
     app->window = SDL_CreateWindow(
-        "Minesweeper", 
+        "Sudoku", 
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
         app->screen_width, app->screen_height, 
         0
@@ -54,6 +128,19 @@ int main(int argc, char** argv) {
     assert(TTF_Init() == 0);
     app->font = TTF_OpenFont("./OpenSans-Regular.ttf", 24);
     assert(app->font != NULL);
+
+    sud = sudoku_create();
+
+    ////////////////////////////
+
+    app->grid_x = app->screen_width * 0.1;
+    app->grid_y = app->screen_height * 0.1;
+    app->grid_w = app->screen_width * 0.5;
+    app->grid_h = app->screen_height * 0.7;
+    app->grid_w -= (app->grid_w % 9);
+    app->grid_h -= (app->grid_h % 9);
+
+    ///////////////////////////
     
     double last_tick = (double)SDL_GetTicks();
     double current_tick = (double)SDL_GetTicks();

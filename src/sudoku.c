@@ -20,6 +20,10 @@ sudoku_t* sudoku_create() {
     return sudoku;
 }
 
+void sudoku_destroy(sudoku_t* sud) {
+    free(sud);
+}
+
 bool sud_solve_round(sudoku_t* sud) {
     bool found_anything = false;
 

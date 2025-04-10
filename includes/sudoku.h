@@ -12,6 +12,7 @@ typedef struct sudoku_t {
 } sudoku_t;
 
 sudoku_t* sudoku_create();
+void sudoku_destroy(sudoku_t* sud);
 bool sud_solve(sudoku_t* sud);
 
 #endif // _SUDOKU_H
