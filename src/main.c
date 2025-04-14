@@ -13,6 +13,30 @@
 app_t* app;
 sudoku_t* sud;
 
+int over_cell_x = -1;
+int over_cell_y = -1;
+
+void on_mouse_move(SDL_Event event) {
+    SDL_MouseMotionEvent motion = event.motion;
+    int x = motion.x;
+    int y = motion.y;
+
+
+    if ((x < app->grid_x) || ((app->grid_x + app->grid_w) < x)) {
+        over_cell_x = -1;
+        over_cell_y = -1;
+        return;
+    }
+    if ((y < app->grid_y) || ((app->grid_y + app->grid_h) < y)) {
+        over_cell_x = -1;
+        over_cell_y = -1;
+        return;
+    }
+    
+    over_cell_x = (x - app->grid_x) / (app->grid_w / 9);
+    over_cell_y = (y - app->grid_y) / (app->grid_h / 9);
+}
+
 void game_handle_events() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -20,6 +44,9 @@ void game_handle_events() {
             case SDL_QUIT: 
                 print("Received SDL_QUIT signal.\n");
                 app->running = false;
+                break;
+            case SDL_MOUSEMOTION:
+                on_mouse_move(event);
                 break;
             default:
                 break;
@@ -61,6 +88,18 @@ void game_render() {
                     .h = ch
                 }
             );
+            if ((cx == over_cell_x) || (cy == over_cell_y)) {
+                SDL_SetRenderDrawColor(app->renderer, 150, 150, 200, 255);
+                SDL_RenderFillRect(
+                    app->renderer,
+                    &(SDL_Rect){
+                        .x = app->grid_x + cx * cw + 1,
+                        .y = app->grid_y + cy * ch + 1,
+                        .w = cw - 2,
+                        .h = ch - 2
+                    }
+                );
+            }
         }
     }
     // Sub grid separators
